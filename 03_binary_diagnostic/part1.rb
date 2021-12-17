@@ -1,3 +1,4 @@
+require 'pry'
 a = File.open(ARGV[0], 'r', &:readlines).map(&:chomp)
 
 b = a.map { |s| s.split(//) }

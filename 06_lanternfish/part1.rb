@@ -22,8 +22,6 @@ hatchlings = [0,0,0,0,0,0,0]
 
 num_days = (ARGV[1] || 10).to_i
 
-rz = [zero_days.dup]
-rh = [hatchlings.dup]
 (num_days + 1).times do |day|
   # 1. Update number of fish
   mod_day = day % 7
@@ -36,8 +34,6 @@ rh = [hatchlings.dup]
   # 3. Hatch hatchlings that are ready
   zero_days[prev_mod_day] += hatchlings[prev_mod_day]
   hatchlings[prev_mod_day] = 0
-  rz << zero_days.dup
-  rh << hatchlings.dup
 end
 
 puts zero_days.reduce(&:+) + hatchlings.reduce(&:+)
