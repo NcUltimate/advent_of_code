@@ -1,5 +1,4 @@
 require 'set'
-require 'pry'
 
 class Program
   class CaveSystem

@@ -43,7 +43,7 @@ class Program
 
   class Part2 < Solver
     def solution
-      PathFinder.new(cave_system).paths.count
+      PathFinder.new(cave_system).paths.size
     end
   end
 end
