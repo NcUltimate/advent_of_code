@@ -44,7 +44,7 @@ class Program
     end
 
     def fold(line)
-      folded = dots.each_with_object([])do |dot, folded|
+      folded = dots.each_with_object(Set.new) do |dot, folded|
         if dot > line
           folded << dot.fold(line)
         else
@@ -52,22 +52,8 @@ class Program
         end
       end
 
-      DotFolder.new(folded.uniq)
+      DotFolder.new(folded)
     end
-
-    def to_s
-      @to_s ||= begin
-        width = dots.max_by(&:x).x
-        height = dots.max_by(&:y).y
-
-        (0..height).reduce('') do |grid_str, y|
-          grid_str + (0..width).each.reduce('') do |str, x|
-            str + (grid_map[x] && grid_map[x][y] ?  '#' : ' ')
-          end + "\n"
-        end
-      end
-    end
-    alias_method :inspect, :to_s
   end
 
   class Dot
