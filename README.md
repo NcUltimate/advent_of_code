@@ -1,4 +1,4 @@
-# 2021 Advent of Code
+# Advent of Code
 
 Each directory contains all solutions and inputs for a given problem, for example:
 
