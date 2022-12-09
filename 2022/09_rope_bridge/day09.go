@@ -162,6 +162,10 @@ func Day09(instructions [][]int, tailLen int, visualize bool) int {
           vecX, vecY = GetTailMove(tail[t], tail[t-1])
         }
 
+        if vecX == 0 && vecY == 0 {
+          break
+        }
+
         tail[t][X] += vecX
         tail[t][Y] += vecY
       }
