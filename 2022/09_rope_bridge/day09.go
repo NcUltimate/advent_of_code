@@ -13,9 +13,7 @@ const (
   Y = 1
 )
 
-func GetTailMove(tail []int, head []int) (x, y int) {
-  vecX, vecY := 0, 0
-
+func GetTailMove(tail []int, head []int) (vecX, vecY int) {
   if head[Y] == tail[Y] + 2 {
     vecY = 1
     if head[X] > tail[X] {
@@ -56,7 +54,7 @@ func GetTailMove(tail []int, head []int) (x, y int) {
     }
   }
 
-  return vecX, vecY
+  return
 }
 
 func Visit(visited map[int]map[int]bool, x int, y int) int {

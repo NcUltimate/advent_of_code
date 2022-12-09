@@ -16,10 +16,22 @@ func benchmark(file string, length int, b *testing.B) {
   }
 }
 
-func BenchmarkDay09_Input(b *testing.B) {
-  benchmark("input.txt", 9, b)
+func BenchmarkDay09_Input_9(b *testing.B) {
+  benchmark("input/input.txt", 9, b)
 }
 
-func BenchmarkDay09_10000(b *testing.B) {
-  benchmark("10000.txt", 9, b)
+func BenchmarkDay09_Input_90(b *testing.B) {
+  benchmark("input/input.txt", 90, b)
+}
+
+func BenchmarkDay09_Input_900(b *testing.B) {
+  benchmark("input/input.txt", 900, b)
+}
+
+func BenchmarkDay09_Input_9000(b *testing.B) {
+  benchmark("input/input.txt", 9000, b)
+}
+
+func BenchmarkDay09_Input_90000(b *testing.B) {
+  benchmark("input/input.txt", 90000, b)
 }
