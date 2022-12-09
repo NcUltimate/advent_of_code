@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-  "strings"
   "strconv"
 )
 
@@ -19,7 +18,7 @@ func main() {
   tailLen := os.Args[2]
   length, _ := strconv.Atoi(tailLen)
 
-  inst := strings.Split(string(data), "\n")
+  inst := Input(string(data))
   visited := Day09(inst, length, false)
   fmt.Printf("Visited Spaces: %v\n", visited)
 }

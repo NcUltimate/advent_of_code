@@ -2,7 +2,6 @@ package main
 
 import (
   "fmt"
-  "strconv"
 )
 
 const (
@@ -14,50 +13,50 @@ const (
   Y = 1
 )
 
-func GetTailMove(tail []int, head []int) []int {
-  result := []int{0, 0}
+func GetTailMove(tail []int, head []int) (x, y int) {
+  vecX, vecY := 0, 0
 
   if head[Y] == tail[Y] + 2 {
-    result[Y] = 1
+    vecY = 1
     if head[X] > tail[X] {
-      result[X] = 1
+      vecX = 1
     }
     if head[X] < tail[X] {
-      result[X] = -1
+      vecX = -1
     }
   }
 
   if head[X] == tail[X] + 2 {
-    result[X] = 1
+    vecX = 1
     if head[Y] > tail[Y] {
-      result[Y] = 1
+      vecY = 1
     }
     if head[Y] < tail[Y] {
-      result[Y] = -1
+      vecY = -1
     }
   }
 
   if head[Y] == tail[Y] - 2 {
-    result[Y] = -1
+    vecY = -1
     if head[X] > tail[X] {
-      result[X] = 1
+      vecX = 1
     }
     if head[X] < tail[X] {
-      result[X] = -1
+      vecX = -1
     }
   }
 
   if head[X] == tail[X] - 2 {
-    result[X] = -1
+    vecX = -1
     if head[Y] > tail[Y] {
-      result[Y] = 1
+      vecY = 1
     }
     if head[Y] < tail[Y] {
-      result[Y] = -1
+      vecY = -1
     }
   }
 
-  return result
+  return vecX, vecY
 }
 
 func Visit(visited map[int]map[int]bool, x int, y int) int {
@@ -104,11 +103,15 @@ func PrintRope(xb []int, yb []int, head []int, tail [][]int, visited map[int]map
   }
 }
 
-func Day09(instructions []string, tailLen int, visualize bool) int {
+func Day09(instructions [][]int, tailLen int, visualize bool) int {
+  if visualize {
+    fmt.Println(instructions)
+  }
+
   head := []int{0, 0}
   tail := make([][]int, tailLen)
   for i := 0; i < tailLen; i++ {
-    tail[i] = []int{0, 0};
+    tail[i] = make([]int, 2);
   }
 
   xb := []int{0, 0}
@@ -124,8 +127,7 @@ func Day09(instructions []string, tailLen int, visualize bool) int {
       continue
     }
 
-    mag, _ := strconv.Atoi(inst[2:])
-    for i := 0; i < mag; i++ {
+    for i := 0; i < inst[1]; i++ {
       if inst[0] == D {
         head[Y] -= 1
         if head[Y] < yb[0] {
@@ -155,15 +157,15 @@ func Day09(instructions []string, tailLen int, visualize bool) int {
       }
 
       for t := 0; t < tailLen; t++ {
-        var vec []int
+        var vecX, vecY int
         if t == 0 {
-          vec = GetTailMove(tail[t], head)
+          vecX, vecY = GetTailMove(tail[t], head)
         } else {
-          vec = GetTailMove(tail[t], tail[t-1])
+          vecX, vecY = GetTailMove(tail[t], tail[t-1])
         }
 
-        tail[t][X] += vec[X]
-        tail[t][Y] += vec[Y]
+        tail[t][X] += vecX
+        tail[t][Y] += vecY
       }
 
       uniqueVisits += Visit(visited, tail[tailLen - 1][X], tail[tailLen - 1][Y])
