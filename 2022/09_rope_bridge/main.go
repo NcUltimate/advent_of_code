@@ -19,6 +19,6 @@ func main() {
   length, _ := strconv.Atoi(tailLen)
 
   inst := Input(string(data))
-  visited := Day09(inst, length, false)
+  visited := Day09(inst, length, len(os.Args) > 2)
   fmt.Printf("Visited Spaces: %v\n", visited)
 }
