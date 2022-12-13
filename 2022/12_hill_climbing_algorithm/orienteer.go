@@ -55,6 +55,11 @@ func (o *Orienteer) traverseBFS(desc bool, target byte) {
 
   for qHead := 0; qHead < len(rQ); qHead++ {
     nr, nc := rQ[qHead], cQ[qHead]
+    if o.hmap[nr][nc] == target && o.lmap[nr][nc] != 0 {
+      if o.lmap[nr][nc] < o.shortest {
+        o.shortest = o.lmap[nr][nc] 
+      }
+    }
 
     coords := [][]int {
       { nr - 1, nc },
@@ -86,19 +91,6 @@ func (o *Orienteer) traverseBFS(desc bool, target byte) {
       }
     }
   }
-
-  min := math.MaxInt
-  for r := 0; r < o.nR; r++ {
-    for c := 0; c < o.nC; c++ {
-      if o.hmap[r][c] == target && o.lmap[r][c] != 0 {
-        if o.lmap[r][c] < min {
-          min = o.lmap[r][c] 
-        }
-      }
-    }
-  }
-
-  o.shortest = min
 }
 
 func (o Orienteer) PrintLMap() {
@@ -107,7 +99,7 @@ func (o Orienteer) PrintLMap() {
       if o.lmap[i][j] == 0 {
         fmt.Printf(" ")
       } else {
-        fmt.Printf("%s", string([]byte{byte(o.lmap[i][j] % 26 + 97)}))
+        fmt.Printf("%s", string([]byte{byte(o.lmap[i][j] % 93 + 33)}))
       }
     }
     fmt.Println()
