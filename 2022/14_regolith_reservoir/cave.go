@@ -35,7 +35,7 @@ func (c Cave) Print() {
   fmt.Printf("Resting: %v\n", c.restingCount)
 }
 
-func (cave *Cave) DripSand() {
+func (cave *Cave) DrawPaths() {
   if cave.didCount {
     return
   }
@@ -92,7 +92,9 @@ func (cave *Cave) DripSand() {
       cave.grid[cave.maxR][c] = '#'
     }
   }
+}
 
+func (cave *Cave) DripSand() {
   lC, lR := COLS, ROWS
   gC, gR := 500, 0
   for lR > 0 && lC > 0 && gC < COLS - 1 && gR < ROWS - 1 {
@@ -123,14 +125,55 @@ func (cave *Cave) DripSand() {
   }
 }
 
-func NewCave(input string, infinite bool) (c Cave) {
-  c.infinite = infinite
-  c.input = input
-  c.minC, c.minR = COLS, ROWS
+func (cave *Cave) PourSand() {
+  cave.PutSand(0, 500)
+}
 
-  c.grid = make([][]byte, ROWS)
+func (cave *Cave) PutSand(r, c int) byte {
+  if r < 0 || c < 0 || r > ROWS - 1 || c > COLS - 1 {
+    return 3 // special byte for hitting infinity
+  }
+
+  if r < cave.minR {
+    cave.minR = r
+  }
+  if c < cave.minC {
+    cave.minC = c
+  }
+  if c > cave.maxC {
+    cave.maxC = c
+  }
+
+  if cave.grid[r][c] != 0 {
+    return cave.grid[r][c]
+  }
+
+  downResult := cave.PutSand(r+1, c)
+  if downResult > 3 {
+
+    leftResult := cave.PutSand(r+1, c-1)
+    if leftResult > 3 {
+
+      rightResult := cave.PutSand(r+1, c+1)
+      if rightResult > 3 {
+        cave.grid[r][c] = 'o'
+        cave.restingCount += 1
+        return 'o'
+      }
+    }
+  }
+
+  return 3
+}
+
+func NewCave(input string, infinite bool) (cave Cave) {
+  cave.infinite = infinite
+  cave.input = input
+  cave.minC, cave.minR = COLS, ROWS
+
+  cave.grid = make([][]byte, ROWS)
   for i := 0; i < ROWS; i++ {
-    c.grid[i] = make([]byte, COLS)
+    cave.grid[i] = make([]byte, COLS)
   }
 
   return

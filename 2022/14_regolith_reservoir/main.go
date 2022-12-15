@@ -15,10 +15,12 @@ func main() {
 	}
 
   part1 := NewCave(string(data), true)
-  part1.DripSand()
+  part1.DrawPaths()
+  part1.PourSand()
   part1.Print()
 
   part2 := NewCave(string(data), false)
-  part2.DripSand()
+  part2.DrawPaths()
+  part2.PourSand()
   part2.Print()
 }
