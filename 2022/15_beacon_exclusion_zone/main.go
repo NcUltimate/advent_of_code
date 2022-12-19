@@ -30,12 +30,12 @@ func main() {
   } else {
     maxCoordStr := os.Args[3]
     maxCoord, _ := strconv.Atoi(maxCoordStr)
-    row, col, distress := sensorGrid.FindDistress(maxCoord)
+    row, col, score := sensorGrid.FindEmpty(maxCoord)
 
     if len(os.Args) > 4 {
       sensorGrid.PrintBounds(row, 0, maxCoord)
     }
 
-    fmt.Printf("Distress Beacon is at [%v, %v] - tuning frequency is %v\n", row, col, distress)
+    fmt.Printf("Distress Beacon is at [%v, %v] - tuning frequency is %v\n", row, col, score)
   }
 }

@@ -3,3 +3,6 @@ Sensor at x=2, y=0: closest beacon is at x=2, y=18
 Sensor at x=4, y=0: closest beacon is at x=4, y=16
 Sensor at x=6, y=0: closest beacon is at x=6, y=14
 Sensor at x=8, y=0: closest beacon is at x=8, y=12
+Sensor at x=20, y=-5: closest beacon is at x=21, y=-1
+Sensor at x=22, y=-5: closest beacon is at x=21, y=-1
+Sensor at x=24, y=-5: closest beacon is at x=21, y=-1

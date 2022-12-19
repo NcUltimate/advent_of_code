@@ -21,21 +21,21 @@ func (g SensorGrid) Cols() int {
   return g.maxc - g.minc + 1
 }
 
-func (g *SensorGrid) FindDistress(maxCoord int) (int, int, int) {
+func (g *SensorGrid) FindEmpty(maxCoord int) (int, int, int) {
   sort.Slice(g.sensors, func(s1, s2 int) bool {
-    return g.sensors[s1].minc < g.sensors[s2].minc
+    return g.sensors[s1].sc < g.sensors[s2].sc
   })
 
-  for row := Max(0, g.minr); row <= Min(maxCoord, g.maxr); row++ {
+  min := Min(maxCoord, g.maxr)
+  for row := 0; row <= min; row++ {
     end := -1
 
-    for _, s := range g.sensors {
-      iStart, iEnd := s.RowSegIntersection(row, 0, end + 1)
-      if iStart == -1 && iEnd == -1 {
+    for s := range g.sensors {
+      iEnd, sEnd := g.sensors[s].RowSegIntersection(row, 0, end + 1)
+      if iEnd == -1 {
         continue
-      } else {
-        _, newEnd := s.Slice(row)
-        end = Max(end, newEnd)
+      } else if sEnd > end {
+        end = sEnd 
       }
     }
 
@@ -54,18 +54,18 @@ func (g *SensorGrid) Scan(row int) int {
   sidx := 0
   for col := g.minc; col <= g.maxc; col++ {
     checkedSensorCount := 0
-    for checkedSensorCount < len(g.sensors) {
-      sensor := g.sensors[sidx]
+    sLen := len(g.sensors)
+    for checkedSensorCount < sLen {
       checkedSensorCount += 1
 
-      for sensor.Intersects(row, col) && sensor.At(row, col) != 'B' {
+      for g.sensors[sidx].Excludes(row, col) {
         checkedSensorCount = 0
         exclusionCount += 1
         col += 1
       }
 
       sidx += 1
-      sidx %= len(g.sensors)
+      sidx %= sLen
     }
   }
 
@@ -123,7 +123,6 @@ func NewSensorGrid(data string) (g SensorGrid) {
       continue
     }
     g.sensors[i] = NewSensor(sensorDatum)
-    g.sensors[i].Print()
 
     g.maxc = Max(g.sensors[i].maxc, g.maxc)
     g.minc = Min(g.sensors[i].minc, g.minc)
