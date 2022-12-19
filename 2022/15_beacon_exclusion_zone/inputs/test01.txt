@@ -1,0 +1,13 @@
+Sensor at x=20, y=180: closest beacon is at x=-20, y=150
+Sensor at x=90, y=160: closest beacon is at x=100, y=160
+Sensor at x=130, y=20: closest beacon is at x=150, y=30
+Sensor at x=120, y=140: closest beacon is at x=100, y=160
+Sensor at x=100, y=200: closest beacon is at x=100, y=160
+Sensor at x=140, y=170: closest beacon is at x=100, y=160
+Sensor at x=80, y=70: closest beacon is at x=20, y=100
+Sensor at x=20, y=0: closest beacon is at x=20, y=100
+Sensor at x=0, y=110: closest beacon is at x=20, y=100
+Sensor at x=170, y=200: closest beacon is at x=210, y=220
+Sensor at x=160, y=70: closest beacon is at x=150, y=30
+Sensor at x=140, y=30: closest beacon is at x=150, y=30
+Sensor at x=200, y=10: closest beacon is at x=150, y=30
