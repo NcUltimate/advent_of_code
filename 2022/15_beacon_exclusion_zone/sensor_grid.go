@@ -3,12 +3,12 @@ package main
 import (
   "fmt"
   "math"
+  "sort"
   "strings"
 )
 
 type SensorGrid struct {
   sensors     []Sensor
-  grid        [][]byte
   maxr, minr  int
   maxc, minc  int
 }
@@ -21,91 +21,92 @@ func (g SensorGrid) Cols() int {
   return g.maxc - g.minc + 1
 }
 
-func (g SensorGrid) Get(r, c int) byte {
-  if !g.Contains(r, c) {
-    return 0
-  }
+func (g *SensorGrid) FindDistress(maxCoord int) (int, int, int) {
+  sort.Slice(g.sensors, func(s1, s2 int) bool {
+    return g.sensors[s1].minc < g.sensors[s2].minc
+  })
 
-  return g.grid[r - g.minr][c - g.minc]
-}
+  for row := Max(0, g.minr); row <= Min(maxCoord, g.maxr); row++ {
+    end := -1
 
-func (g SensorGrid) CanPut(b byte, r, c int) bool {
-  atRc := g.Get(r, c)
-  return atRc == ' ' || (atRc != b && atRc != 'S' && atRc != 'B')
-}
-
-func (g *SensorGrid) Put(b byte, r, c int) {
-  g.grid[r - g.minr][c - g.minc] = b
-}
-
-func (g SensorGrid) Contains(r, c int) bool {
-  return r >= g.minr && r <= g.maxr && c >= g.minc && c <= g.maxc
-}
-
-func (g *SensorGrid) Scan() {
-  for i := range g.sensors {
-    s := g.sensors[i]
-
-    qr := make([]int, 0, s.ScanArea())
-    qc := make([]int, 0, s.ScanArea())
-    qd := make([]int, 0, s.ScanArea())
-
-    qr = append(qr, s.sr)
-    qc = append(qc, s.sc)
-    qd = append(qd, 0)
-
-    for qhead := 0; qhead < len(qr); qhead++ {
-      r, c, d := qr[qhead], qc[qhead], qd[qhead]
-
-      var neighbs = [][]int{
-        { r + 1, c },
-        { r - 1, c },
-        { r, c + 1 },
-        { r, c - 1 },
-      };
-
-      for n := range neighbs {
-        nr, nc := neighbs[n][0], neighbs[n][1]
-        if !g.Contains(nr, nc) {
-          continue
-        }
-
-        if !g.CanPut(s.id, nr, nc) {
-          continue
-        }
-
-        if d + 1 > s.Dist() {
-          continue
-        }
-
-        qr = append(qr, nr)
-        qc = append(qc, nc)
-        qd = append(qd, d + 1)
-        g.Put(s.id, nr, nc)
+    for _, s := range g.sensors {
+      iStart, iEnd := s.RowSegIntersection(row, 0, end + 1)
+      if iStart == -1 && iEnd == -1 {
+        continue
+      } else {
+        _, newEnd := s.Slice(row)
+        end = Max(end, newEnd)
       }
     }
-  }
-}
 
-func (s *SensorGrid) CountExclusions(row int) int {
-  if !s.Contains(row, s.minc) {
-    return 0
-  }
-
-  count := 0
-  for col := s.minc; col < s.maxc; col++ {
-    if s.Get(row, col) != 'B' && s.Get(row, col) != ' ' {
-      count += 1
+    if end == -1 {
+      return row, 0, row
+    } else if end < maxCoord {
+      return row, end + 1, row + (end + 1) * 4000000
     }
   }
 
-  return count
+  return -1, -1, -1
 }
 
-func (g SensorGrid) Print() {
-  for r := range g.grid {
-    for c := range g.grid[r] {
-      fmt.Printf("%v", string([]byte{g.grid[r][c]}))
+func (g *SensorGrid) Scan(row int) int {
+  exclusionCount := 0
+  sidx := 0
+  for col := g.minc; col <= g.maxc; col++ {
+    checkedSensorCount := 0
+    for checkedSensorCount < len(g.sensors) {
+      sensor := g.sensors[sidx]
+      checkedSensorCount += 1
+
+      for sensor.Intersects(row, col) && sensor.At(row, col) != 'B' {
+        checkedSensorCount = 0
+        exclusionCount += 1
+        col += 1
+      }
+
+      sidx += 1
+      sidx %= len(g.sensors)
+    }
+  }
+
+  return exclusionCount
+}
+
+func (g SensorGrid) Print(row int) {
+  g.PrintBounds(row, Min(g.minr, g.minc), Max(g.maxr, g.maxc))
+}
+
+func (g SensorGrid) PrintBounds(row, minCoord, maxCoord int) {
+  for r := minCoord; r <= Min(g.maxr, maxCoord); r++ {
+    if r == row {
+      fmt.Printf(">") 
+    } else {
+      fmt.Printf(" ")
+    }
+
+    for c := minCoord; c <= maxCoord; c++ {
+      var intersects byte = 0
+      for _, s := range g.sensors {
+        at := s.At(r, c)
+        if at != 0 {
+          intersects = at
+          if at == 'S' || at == 'B' {
+            break
+          }
+        }
+      }
+
+      if intersects == 0 {
+        fmt.Printf(" ")
+      } else {
+        fmt.Printf("%v", string([]byte{intersects}))
+      }
+    }
+
+    if r == row {
+      fmt.Printf("<") 
+    } else {
+      fmt.Printf(" ")
     }
     fmt.Println()
   }
@@ -122,50 +123,14 @@ func NewSensorGrid(data string) (g SensorGrid) {
       continue
     }
     g.sensors[i] = NewSensor(sensorDatum)
+    g.sensors[i].Print()
 
-    if g.sensors[i].sc > g.maxc {
-      g.maxc = g.sensors[i].sc
-    }
-    if g.sensors[i].sc < g.minc {
-      g.minc = g.sensors[i].sc
-    }
-    if g.sensors[i].bc > g.maxc {
-      g.maxc = g.sensors[i].bc
-    }
-    if g.sensors[i].bc < g.minc {
-      g.minc = g.sensors[i].bc
-    }
-    if g.sensors[i].sr > g.maxr {
-      g.maxr = g.sensors[i].sr
-    }
-    if g.sensors[i].sr < g.minr {
-      g.minr = g.sensors[i].sr
-    }
-    if g.sensors[i].br > g.maxr {
-      g.maxr = g.sensors[i].br
-    }
-    if g.sensors[i].br < g.minr {
-      g.minr = g.sensors[i].br
-    }
+    g.maxc = Max(g.sensors[i].maxc, g.maxc)
+    g.minc = Min(g.sensors[i].minc, g.minc)
+    g.maxr = Max(g.sensors[i].maxr, g.maxr)
+    g.minr = Min(g.sensors[i].minr, g.minr)
   }
 
-  fmt.Printf("Making a %v x %v grid\n", g.Rows(), g.Cols())
-
-  g.grid = make([][]byte, g.Rows())
-  for r := 0; r < g.Rows(); r++ {
-    g.grid[r] = make([]byte, g.Cols())
-    for c := 0; c < g.Cols(); c++ {
-      g.grid[r][c] = ' '
-    }
-  }
-
-  fmt.Printf("Grid is %v x %v\n", g.Rows(), g.Cols())
-
-  for s := range g.sensors {
-    g.sensors[s].Print()
-    g.Put('S', g.sensors[s].sr, g.sensors[s].sc)
-    g.Put('B', g.sensors[s].br, g.sensors[s].bc)
-  }
 
   return
 }
