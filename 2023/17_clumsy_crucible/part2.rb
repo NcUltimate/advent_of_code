@@ -1,0 +1,1 @@
+lines = File.open(ARGV[0], 'r', &:readlines)
