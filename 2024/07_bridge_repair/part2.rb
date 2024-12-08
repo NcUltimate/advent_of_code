@@ -1,17 +1,17 @@
 eqs = File.open(ARGV[0], 'r', &:readlines)
   .map { |l| l.chomp.scan(/\d+/).map(&:to_i) }
 
-def solvable(eq, r = eq[1], d = 2, ops = [])
+def solvable(eq, r = eq[1], d = 2)
   return r == eq[0] if d == eq.length
   return false if r > eq[0]
 
-  plus = solvable(eq, r + eq[d], d + 1, ops + ['+'])
+  plus = solvable(eq, r + eq[d], d + 1)
   return plus if plus
 
-  mul = solvable(eq, r * eq[d], d + 1, ops + ['*'])
+  mul = solvable(eq, r * eq[d], d + 1)
   return mul if mul
 
-  return solvable(eq, "#{r}#{eq[d]}".to_i, d + 1, ops + ['||'])
+  return solvable(eq, "#{r}#{eq[d]}".to_i, d + 1)
 end
 
 puts eqs.reduce(0) { |sum, eq|
