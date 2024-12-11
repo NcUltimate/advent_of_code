@@ -13,32 +13,26 @@ starts = GRID.each_index.each_with_object([]) { |ridx, s|
   }
 }
 
-def hoof_to(start, rating = false)
-  q, v, t = [start], Set.new, 0
-  while q.length > 0
-    r,c = q.shift
-    next if !rating && v.member?([r,c])
+V = Set.new
+def hoof_to(r,c, rating = false)
+  V.add([r, c])
+  return 1 if GRID[r][c] == 9
 
-    v.add([r, c])
+  neighbors = [
+    [r - 1, c],
+    [r, c - 1],
+    [r + 1, c],
+    [r, c + 1],
+  ]
 
-    next t += 1 if GRID[r][c] == 9
-
-    neighbors = [
-      [r - 1, c],
-      [r, c - 1],
-      [r + 1, c],
-      [r, c + 1],
-    ]
-
-    neighbors.each { |(nr, nc)|
-      next if v.member?([nr,nc])
-      next unless GRID[nr][nc] == GRID[r][c] + 1
-      q.push([nr, nc])
-    }
-  end
-  t
+  neighbors.reduce(0) { |total, (nr, nc)|
+    next total if !rating && V.member?([nr,nc])
+    next total unless GRID[nr][nc] == GRID[r][c] + 1
+    total + hoof_to(nr, nc, rating)
+  }
 end
 
 puts starts.reduce(0) { |total, start|
-  total + hoof_to(start, true)
+  V.clear
+  total + hoof_to(*start, true)
 }
