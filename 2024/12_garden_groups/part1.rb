@@ -15,12 +15,10 @@ def neighbors(r, c)
   ]
 end
 
-# Preprocess to rename duplicate regions by doing a BFS "wash"
-# starting at each (x,y) and reassigning a utf8 char to the grid
+results = []
+
 visited = Set.new
 uniq = Set.new
-
-redress = 32
 
 (1...GARDENS.length - 1).each { |r|
   (1...GARDENS[r].length - 1).each { |c|
@@ -28,13 +26,13 @@ redress = 32
     visited.add([r, c])
 
     id = GARDENS[r][c]
-    area = Set.new 
+    garden = Set.new 
     q = [[r, c]]
     while !q.empty?
       neighbor = q.shift
 
       visited.add(neighbor)
-      area.add(neighbor)
+      garden.add(neighbor)
 
       neighbors(*neighbor).each { |n|
         next unless GARDENS[n[0]][n[1]] == id
@@ -44,30 +42,17 @@ redress = 32
       }
     end
 
-    area.each { |n|
-      redress += 1 if [redress].pack('U') == '.'
-      GARDENS[n[0]][n[1]] = [redress].pack('U')
+    area = garden.length
+    perimeter = garden.reduce(0) { |p, g|
+      p + neighbors(g[0], g[1]).count { |(nr, nc)|
+        id != GARDENS[nr][nc]
+      }
     }
-    
-    redress += 1
+
+    results.push([perimeter, area])
   }
 }
 
-# Calculate areas
-perimeters = Hash.new { 0 }
-areas = Hash.new { 0 }
-
-(1...GARDENS.length - 1).each { |r|
-  (1...GARDENS[r].length - 1).each { |c|
-    garden = GARDENS[r][c]
-    perimeters[garden] += neighbors(r, c).count { |(nr, nc)|
-      garden != GARDENS[nr][nc]
-    }
-
-    areas[garden] += 1
-  }
-}
-
-puts perimeters.keys.reduce(0) { |s, g|
-  s + perimeters[g] * areas[g]
+puts results.reduce(0) { |s, garden|
+  s + garden[0] * garden[1]
 }
